@@ -25,11 +25,6 @@ def build_parser() -> argparse.ArgumentParser:
         required=True,
         help="Output directory.",
     )
-    parser.add_argument(
-        "--out-name",
-        default="correlation_matrix.pdf",
-        help="Output PDF name (default: correlation_matrix.pdf).",
-    )
     return parser
 
 
@@ -39,7 +34,7 @@ def main() -> int:
 
     out_dir = Path(args.output)
     out_dir.mkdir(parents=True, exist_ok=True)
-    out_pdf = out_dir / args.out_name
+    out_pdf = out_dir / (Path(args.file).stem + ".pdf")
 
     df = pd.read_csv(args.file, index_col="RESI")
     corr = df.T.corr().abs().fillna(0)
@@ -57,7 +52,7 @@ def main() -> int:
     )
     ax.set_title("CHESCA Continuous Correlation Heatmap")
     fig.tight_layout()
-    fig.savefig(out_pdf)
+    fig.savefig(str(out_pdf))
 
     print(f"Saved: {out_pdf}")
     print("Color scheme: seaborn 'mako' (perceptually uniform sequential colormap)")
