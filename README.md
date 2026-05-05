@@ -117,6 +117,24 @@ Outputs saved to the output directory:
 
 ---
 
+## Cluster / Headless: correlation matrix only
+
+If you only want `correlation_matrix.pdf` (no dendrogram/SVD/PyMOL outputs),
+use the helper script in this repo:
+
+```bash
+python run_heatmap_only.py \
+	-file my_shifts.csv \
+	-output results/ \
+	-cutoff 98.0 \
+	-linkage complete
+```
+
+This script forces the non-interactive Matplotlib backend (`Agg`) so it runs
+cleanly on clusters without a display.
+
+---
+
 ## Development
 
 ```bash
