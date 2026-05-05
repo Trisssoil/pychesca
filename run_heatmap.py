@@ -5,7 +5,7 @@ from __future__ import annotations
 import argparse
 from pathlib import Path
 
-import matplotlib
+import matplotlib # type: ignore
 import pandas as pd
 
 from pychesca import HAC
