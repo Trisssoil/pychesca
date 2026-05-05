@@ -6,15 +6,14 @@ import argparse
 from pathlib import Path
 
 import matplotlib # type: ignore
+import matplotlib.pyplot as plt # type: ignore
 import pandas as pd
-
-from pychesca import HAC
-from pychesca.plots import plot_corr
+import seaborn as sns # type: ignore
 
 
 def build_parser() -> argparse.ArgumentParser:
     parser = argparse.ArgumentParser(
-        description="Generate only CHESCA correlation matrix PDF (cluster/headless friendly)."
+        description="Generate a continuous CHESCA correlation heatmap PDF (cluster/headless friendly)."
     )
     parser.add_argument(
         "-file",
@@ -25,18 +24,6 @@ def build_parser() -> argparse.ArgumentParser:
         "-output",
         required=True,
         help="Output directory.",
-    )
-    parser.add_argument(
-        "-cutoff",
-        type=float,
-        default=98.0,
-        help="Correlation cutoff as percent (default: 98.0).",
-    )
-    parser.add_argument(
-        "-linkage",
-        default="complete",
-        choices=["complete", "single", "average", "ward"],
-        help="HAC linkage method (default: complete).",
     )
     parser.add_argument(
         "--out-name",
@@ -55,10 +42,25 @@ def main() -> int:
     out_pdf = out_dir / args.out_name
 
     df = pd.read_csv(args.file, index_col="RESI")
-    hac = HAC(df, cutoff=args.cutoff, method=args.linkage)
-    plot_corr(hac, cutoff=args.cutoff, save_file=str(out_pdf))
+    corr = df.T.corr().abs().fillna(0)
+
+    fig, ax = plt.subplots(figsize=(14, 12))
+    sns.heatmap(
+        corr,
+        cmap="mako",
+        vmin=0.0,
+        vmax=1.0,
+        square=True,
+        linewidths=0.2,
+        cbar_kws={"label": "|Correlation|"},
+        ax=ax,
+    )
+    ax.set_title("CHESCA Continuous Correlation Heatmap")
+    fig.tight_layout()
+    fig.savefig(out_pdf)
 
     print(f"Saved: {out_pdf}")
+    print("Color scheme: seaborn 'mako' (perceptually uniform sequential colormap)")
     return 0
 
 
